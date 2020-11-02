@@ -117,7 +117,7 @@ def create_account(email, password):
         "AccountVO":{
             "primaryEmail": email,
             "primaryPhone": None,
-            "fullName": "Cristina Dev McTest",
+            "fullName": "Functional Filetype Test",
             "agreed": True,
             "optIn": False,
             "inviteCode": ""
