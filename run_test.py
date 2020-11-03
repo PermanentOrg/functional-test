@@ -42,6 +42,7 @@ class PermanentRequest():
         if not response.ok:
             raise_for_status(response)
         json_resp = response.json()
+        logging.debug("Response body: %s", json_resp)
         assert json_resp["isSuccessful"]
         self.response = json_resp["Results"][0]["data"][0]
         PermanentRequest.csrf = json_resp["csrf"]
@@ -101,7 +102,8 @@ def upload_file(filename, record_id):
     response = requests.post(f"{BASE_URL}:9000", files={'thefile': open(filename, 'rb')},
                     data={"recordid": record_id})
     logging.info("Finished upload")
-    assert response.ok
+    if not response.ok:
+        raise_for_status(response)
 
 
 def get_folder_info():
@@ -166,7 +168,7 @@ def raise_for_status(response):
     """
     Custom exceptions with more appropriate error message.
     """
-    http_error_msg = response.status_code
+    http_error_msg = str(response.status_code)
 
     if 400 <= response.status_code < 500:
         http_error_msg += " Client Error: "
