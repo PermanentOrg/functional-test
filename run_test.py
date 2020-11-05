@@ -63,7 +63,8 @@ def test_file_upload(file_path, parent_folder_id, parent_folder_link_id, timeout
         status = record["status"]
         time.sleep(1)
         i += 1
-    result = [filename, record["type"], record["status"], len(record["FileVOs"]), i]
+    file_conversions = ",".join([vO["type"].split(".")[-1] for vO in record["FileVOs"]])
+    result = [filename, record["type"].split(".")[-1], record["status"].split(".")[-1], file_conversions, i]
     logging.info(result)
     return result
 
@@ -203,7 +204,7 @@ def main():
     API_KEY = sys.argv[2]
     email = "engineers+prmnttstr{}@permanent.org".format(int(time.time()))
     password = "".join(random.choice(string.ascii_letters) for i in range(12))
-    timeout = 30
+    timeout = 60
     print(f"Current timeout is {timeout} seconds")
     print("Credentials:", email, password)
 
@@ -217,7 +218,7 @@ def main():
 
     files = get_file_list(sys.argv[3])
     results = []
-    headers = ["File Name", "Type", "Status", "# FileVOs", "Time"]
+    headers = ["File Name", "Type", "Status", "File Formats", "Time"]
     for f in files:
         logging.info("Processing %s", f)
         results.append(test_file_upload(f, parent_folder_id, parent_folder_link_id, timeout))
