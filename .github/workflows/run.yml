@@ -4,13 +4,15 @@ on:
     workflow_dispatch:
 
 jobs:
-    validate:
+    execute:
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v1
         - uses: actions/setup-python@v2
           with:
             python-version: '3.x'
+        - name: Install dependencies
+          run: pip install -r requirements.txt
         - uses: aws-actions/configure-aws-credentials@v1
           with:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -20,5 +22,5 @@ jobs:
           run: aws s3 cp s3://permanent-repos/test_files/one-of-each-type.zip .
         - name: Unarchive test files
           run: unzip one-of-each-type.zip
-        - name: Execute
+        - name: Run the test
           run: python run_test.py dev ${{secrets.DEV_API_KEY}} files/
