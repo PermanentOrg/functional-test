@@ -17,7 +17,7 @@ jobs:
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: ${{ secrets.AWS_DEFAULT_REGION }} 
         - name: Download test files
-          run: aws s3 cp s3://permanent-local/test_files/one-of-each-type.zip .
+          run: aws s3 cp s3://permanent-repos/test_files/one-of-each-type.zip .
         - name: Unarchive test files
           run: unzip one-of-each-type.zip
         - name: Execute
