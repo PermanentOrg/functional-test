@@ -203,10 +203,10 @@ def main():
     BASE_URL = f"https://{sys.argv[1]}.permanent.org"
     API_KEY = sys.argv[2]
     email = "engineers+prmnttstr{}@permanent.org".format(int(time.time()))
+    print("User account email:", email)
     password = "".join(random.choice(string.ascii_letters) for i in range(12))
     timeout = 60
     print(f"Current timeout is {timeout} seconds")
-    print("Credentials:", email, password)
 
     createaccount_result = create_account(email, password)
     login_result = login(email, password)
