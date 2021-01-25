@@ -3,7 +3,6 @@
 import logging
 import sys
 import os
-import os.path
 import time
 import string
 import random
@@ -48,25 +47,96 @@ class PermanentRequest():
         PermanentRequest.csrf = json_resp["csrf"]
 
 
+def get_presigned_url(record_vo):
+    body = [{
+        'RecordVO': record_vo,
+        'SimpleVO': {
+            'key': 'type',
+            'value': 'application/octet-stream',
+        },
+    }]
+    request = PermanentRequest('/api/record/getPresignedUrl', data=body)
+    return request.response['SimpleVO']['value']
+
+
+def upload_to_s3(s3_url, file_path, presigned_post):
+    fields = presigned_post['fields']
+    with open(file_path, 'rb') as f:
+        fields['Content-Type'] = 'application/octet-stream'
+        logging.debug('Data to be form encoded for S3:')
+        logging.debug(fields)
+        r = requests.post(
+            presigned_post['url'],
+            data=fields,
+            files={'file': f}
+        )
+        r.raise_for_status()
+
+
+def register_record(record_vo, s3_url):
+    body = {
+        'RecordVO': record_vo,
+        'SimpleVO': {
+            'key': 's3url',
+            'value': s3_url,
+        },
+    }
+    request = PermanentRequest('/api/record/registerRecord', data=body)
+    return request.response['RecordVO']
+
+
 def test_file_upload(file_path, parent_folder_id, parent_folder_link_id, timeout):
     '''
     Perform the file upload requests, and then poll for status until the timeout.
     '''
     filename = os.path.basename(file_path)
-    record_id, archive_nbr = create_file_metadata(filename, parent_folder_id, parent_folder_link_id)
-    upload_file(file_path, record_id)
+
+    record_vo = {
+        "parentFolderId": parent_folder_id,
+        "parentFolder_linkId": parent_folder_link_id,
+        "displayName": filename,
+        "uploadFileName": filename,
+        "size": os.path.getsize(file_path),
+        "derivedCreatedDT": int(time.time()),
+    }
+
+    s3_info = get_presigned_url(record_vo)
+
+    logging.debug('S3 info:')
+    logging.debug(s3_info)
+
+    upload_to_s3(s3_info['destinationUrl'], file_path, s3_info['presignedPost'])
+    created_record_vo  = register_record(record_vo, s3_info['destinationUrl'])
+
+    attempts, processed_record = measure_post_upload_processing(created_record_vo, timeout)
+    result = [
+        filename,
+        processed_record["type"].split(".")[-1],
+        processed_record["status"].split(".")[-1],
+        ",".join([
+            vo["type"].split(".")[-1]
+            for vo
+            in processed_record["FileVOs"]
+        ]),
+        attempts,
+    ]
+    return result
+
+
+def measure_post_upload_processing(record_vo, timeout):
+    record_id = record_vo['recordId']
+    archive_number = record_vo['archiveNbr']
+
     i = 0
     status = ""
     record = ""
+
     while (i < timeout and status != "status.generic.ok"):
-        record = get_record(record_id, archive_nbr)
+        record = get_record(record_id, archive_number)
         status = record["status"]
         time.sleep(1)
         i += 1
-    file_conversions = ",".join([vO["type"].split(".")[-1] for vO in record["FileVOs"]])
-    result = [filename, record["type"].split(".")[-1], record["status"].split(".")[-1], file_conversions, i]
-    logging.info(result)
-    return result
+    return i, record
 
 
 def get_record(record_id, archive_nbr):
@@ -79,32 +149,6 @@ def get_record(record_id, archive_nbr):
     }]
     request = PermanentRequest("/api/record/get", data=body)
     return request.response["RecordVO"]
-
-
-def create_file_metadata(filename, parent_folder_id, parent_folder_link_id):
-    logging.info("Post record metadata")
-    body = [{
-        "RecordVO": {
-            "parentFolderId": parent_folder_id,
-            "parentFolder_linkId": parent_folder_link_id,
-            "displayName": filename,
-            "uploadFileName": filename,
-            "derivedCreatedDT": int(time.time())
-        }
-    }]
-    meta_request = PermanentRequest("/api/record/postmetabatch", data=body)
-    assert meta_request.response["RecordVO"]["status"] == "status.record.only_meta"
-    return (meta_request.response["RecordVO"]["recordId"],
-                meta_request.response["RecordVO"]["archiveNbr"])
-
-
-def upload_file(filename, record_id):
-    logging.info("Upload file")
-    response = requests.post(f"{BASE_URL}:9000", files={'thefile': open(filename, 'rb')},
-                    data={"recordid": record_id})
-    logging.info("Finished upload")
-    if not response.ok:
-        raise_for_status(response)
 
 
 def get_folder_info():
@@ -192,6 +236,7 @@ def get_file_list(path):
 
 
 def main():
+    logging.getLogger().setLevel('INFO')
     global BASE_URL, API_KEY
     if len(sys.argv) != 4:
         logging.critical("This script requires 3 arguments: environment, api key, and "
