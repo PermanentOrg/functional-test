@@ -48,6 +48,7 @@ class PermanentRequest():
 
 
 def get_presigned_url(record_vo):
+    logging.info('Get pre-signed URL for %s', record_vo['displayName'])
     body = [{
         'RecordVO': record_vo,
         'SimpleVO': {
@@ -60,11 +61,13 @@ def get_presigned_url(record_vo):
 
 
 def upload_to_s3(s3_url, file_path, presigned_post):
+    logging.info('Upload file %s', file_path)
+
     fields = presigned_post['fields']
+    fields['Content-Type'] = 'application/octet-stream'
+    logging.debug('Upload form data: %s', fields)
+
     with open(file_path, 'rb') as f:
-        fields['Content-Type'] = 'application/octet-stream'
-        logging.debug('Data to be form encoded for S3:')
-        logging.debug(fields)
         r = requests.post(
             presigned_post['url'],
             data=fields,
@@ -74,6 +77,7 @@ def upload_to_s3(s3_url, file_path, presigned_post):
 
 
 def register_record(record_vo, s3_url):
+    logging.info('Register record for file %s', record_vo['displayName'])
     body = {
         'RecordVO': record_vo,
         'SimpleVO': {
@@ -101,10 +105,6 @@ def test_file_upload(file_path, parent_folder_id, parent_folder_link_id, timeout
     }
 
     s3_info = get_presigned_url(record_vo)
-
-    logging.debug('S3 info:')
-    logging.debug(s3_info)
-
     upload_to_s3(s3_info['destinationUrl'], file_path, s3_info['presignedPost'])
     created_record_vo  = register_record(record_vo, s3_info['destinationUrl'])
 
@@ -120,6 +120,7 @@ def test_file_upload(file_path, parent_folder_id, parent_folder_link_id, timeout
         ]),
         attempts,
     ]
+    logging.info(result)
     return result
 
 
@@ -236,7 +237,6 @@ def get_file_list(path):
 
 
 def main():
-    logging.getLogger().setLevel('INFO')
     global BASE_URL, API_KEY
     if len(sys.argv) != 4:
         logging.critical("This script requires 3 arguments: environment, api key, and "
