@@ -17,4 +17,6 @@ python run_test.py dev apiKey ../files/
 
 The first argument to the script should be the environment that the script should run on, the second should be the `apiKey` for that environment, and the third the directory containing files for upload.
 
+In Powershell, use .\venv\Scripts\activate instead of source venv/bin/activate
+
 The test can also be run from the ["Actions" tab](https://github.com/PermanentOrg/functional-test/actions).
