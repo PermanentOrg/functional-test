@@ -23,4 +23,4 @@ jobs:
         - name: Unarchive test files
           run: unzip one-of-each-type.zip
         - name: Run the test
-          run: python run_test.py staging "${{secrets.STAGING_API_KEY}}" files/
+          run: python run_test.py staging files/

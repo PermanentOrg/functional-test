@@ -12,7 +12,6 @@ import requests
 
 
 BASE_URL = ""
-API_KEY = ""
 
 class PermanentRequest():
     csrf = ""
@@ -25,7 +24,6 @@ class PermanentRequest():
         self.body = {
             "RequestVO": {
                 "data": data,
-                "apiKey": API_KEY,
                 "csrf": PermanentRequest.csrf
              },
         }
@@ -237,13 +235,12 @@ def get_file_list(path):
     return file_list
 
 
-def main(environment, api_key, path):
-    global BASE_URL, API_KEY
+def main(environment, path):
+    global BASE_URL
     if not os.path.isdir(path):
         logging.critical("The path argument is not a directory")
         return
     BASE_URL = f"https://{environment}.permanent.org"
-    API_KEY = api_key
     email = "engineers+prmnttstr{}@permanent.org".format(int(time.time()))
     print("User account email:", email)
     password = "".join(random.choice(string.ascii_letters) for i in range(12))
@@ -276,7 +273,6 @@ def parse_args():
         choices=['local', 'dev', 'staging', 'www'],
         help='environment that the script should run on',
     )
-    parser.add_argument('api_key', help='Permanent API key')
     parser.add_argument('path',
         help='directory containing files for upload',
     )
@@ -285,4 +281,4 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    main(args.environment, args.api_key, args.path)
+    main(args.environment, args.path)
