@@ -15,7 +15,7 @@ pip install -r requirements.txt
 python run_test.py dev apiKey ../files/
 ```
 
-The first argument to the script should be the environment that the script should run on, the second should be the `apiKey` for that environment, and the third the directory containing files for upload.
+See `python run_test.py -h` for more information about the arguments it accepts.
 
 In Powershell, use .\venv\Scripts\activate instead of source venv/bin/activate
 

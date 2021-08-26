@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import logging
 import sys
 import os
@@ -236,17 +237,13 @@ def get_file_list(path):
     return file_list
 
 
-def main():
+def main(environment, api_key, path):
     global BASE_URL, API_KEY
-    if len(sys.argv) != 4:
-        logging.critical("This script requires 3 arguments: environment, api key, and "
-                         " a path to files to upload.")
+    if not os.path.isdir(path):
+        logging.critical("The path argument is not a directory")
         return
-    if not os.path.isdir(sys.argv[3]):
-        logging.critical("The 3rd argument is not a directory path")
-        return
-    BASE_URL = f"https://{sys.argv[1]}.permanent.org"
-    API_KEY = sys.argv[2]
+    BASE_URL = f"https://{environment}.permanent.org"
+    API_KEY = api_key
     email = "engineers+prmnttstr{}@permanent.org".format(int(time.time()))
     print("User account email:", email)
     password = "".join(random.choice(string.ascii_letters) for i in range(12))
@@ -261,7 +258,7 @@ def main():
     logged_in()
     parent_folder_id, parent_folder_link_id = get_folder_info()
 
-    files = get_file_list(sys.argv[3])
+    files = get_file_list(path)
     results = []
     headers = ["File Name", "Type", "Status", "File Formats", "Time"]
     for f in files:
@@ -271,5 +268,21 @@ def main():
     print(tabulate(results, headers, tablefmt="github"))
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Test that uploading to Permanent.org works correctly',
+    )
+    parser.add_argument('environment',
+        choices=['local', 'dev', 'staging', 'www'],
+        help='environment that the script should run on',
+    )
+    parser.add_argument('api_key', help='Permanent API key')
+    parser.add_argument('path',
+        help='directory containing files for upload',
+    )
+
+    return parser.parse_args()
+
 if __name__ == "__main__":
-    main()
+    args = parse_args()
+    main(args.environment, args.api_key, args.path)
