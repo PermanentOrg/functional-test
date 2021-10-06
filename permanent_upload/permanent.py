@@ -125,7 +125,7 @@ class PermanentAPI:
         utils.upload_to_s3(
             s3_info["destinationUrl"], file_path, s3_info["presignedPost"]
         )
-        created_record_vo = self.register_record(record_vo, s3_info["destinationUrl"])
+        created_record_vo = self._register_record(record_vo, s3_info["destinationUrl"])
 
         attempts, processed_record = self._measure_post_upload_processing(
             created_record_vo, timeout
