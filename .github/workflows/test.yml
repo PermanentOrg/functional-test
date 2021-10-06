@@ -19,6 +19,6 @@ jobs:
         - name: Run formatter 
           run: black --check permanent_upload
         - name: Run package help
-          run: python3 -m permanent-upload -h
+          run: python3 -m permanent_upload -h
 
 
