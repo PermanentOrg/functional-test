@@ -1,26 +1,27 @@
-name: Run on prod
+name: Run shortlist (prod)
 
 on:
-    workflow_dispatch:
+  repository_dispatch:
+    types: [prod-deployed]
 
 jobs:
-    execute:
-        runs-on: ubuntu-latest
-        steps:
-        - uses: actions/checkout@v1
-        - uses: actions/setup-python@v2
-          with:
-            python-version: '3.x'
-        - name: Install dependencies
-          run: pip install -r requirements.txt
-        - uses: aws-actions/configure-aws-credentials@v1
-          with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: ${{ secrets.AWS_DEFAULT_REGION }} 
-        - name: Download test files
-          run: aws s3 cp s3://permanent-repos/test_files/one-of-each-type.zip .
-        - name: Unarchive test files
-          run: unzip one-of-each-type.zip
-        - name: Run the test
-          run: python -m permanent_upload www files/
+  execute:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }} 
+      - name: Download test files
+        run: aws s3 cp s3://permanent-repos/test_files/critical-path.zip .
+      - name: Unarchive test files
+        run: unzip critical-path.zip
+      - name: Run the test
+        run: python -m permanent_upload www files/

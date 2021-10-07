@@ -1,8 +1,8 @@
-import requests
 import logging
+import requests
 
 
-def upload_to_s3(s3_url, file_path, presigned_post):
+def upload_to_s3(file_path, presigned_post):
     logging.info("Upload file %s", file_path)
 
     fields = presigned_post["fields"]
