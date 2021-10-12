@@ -2,7 +2,7 @@ name: Upload all supported file types (prod)
 
 on:
   schedule:
-    - cron:  '0 0 * * * *'
+    - cron:  '0 0 * * * '
 
 jobs:
   execute:
