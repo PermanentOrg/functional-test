@@ -66,8 +66,8 @@ def main(environment, path):
         results.append(
             api.file_upload(f, parent_folder_id, parent_folder_link_id, timeout)
         )
-    validate_supported_types(results)
     print(tabulate(results, headers, tablefmt="github"))
+    validate_supported_types(results)
 
 
 if __name__ == "__main__":
