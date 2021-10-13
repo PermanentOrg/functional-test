@@ -3,6 +3,7 @@ name: Run shortlist (staging)
 on:
   repository_dispatch:
     types: [staging-deployed] 
+  workflow_dispatch:
 
 jobs:
   execute:
