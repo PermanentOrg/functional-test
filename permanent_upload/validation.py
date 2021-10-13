@@ -1,9 +1,13 @@
 import csv
+import os
 
 
 def validate_supported_types(results, data_file="data/supported_file_types.csv"):
     validation_dataset = {}
-    with open(data_file) as csvfile:
+    data_file_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), data_file
+    )
+    with open(data_file_path, "r") as csvfile:
         validation_reader = csv.reader(csvfile)
         for row in validation_reader:
             validation_dataset[row[0]] = row[1:]
