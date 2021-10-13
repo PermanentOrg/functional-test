@@ -17,8 +17,7 @@ def validate_supported_types(results, data_file="data/supported_file_types.csv")
         # File type classification (e.g. audio, image)
         assert validation_dataset[extension][0] == result[1]
         # Final status (e.g. ok, manual_review)
-        assert validation_dataset[extension][1] == result[2]
-        # File conversions (e.g. html,pdfa,txt)
-        assert validation_dataset[extension][2] == result[3]
-        # Conversion don't take longer than 60 seconds
-        assert result[4] < 60
+        assert validation_dataset[extension][1] in [result[2], "uploaded"]
+        if validation_dataset[extension][1] != "uploaded":
+            # File conversions (e.g. html,pdfa,txt)
+            assert validation_dataset[extension][2] == result[3]
