@@ -2,8 +2,7 @@ name: Run shortlist (dev)
 
 on:
   repository_dispatch:
-    types: [dev-deployed] 
-  workflow_dispatch:
+    types: [dev_deployed]
 
 jobs:
   execute:

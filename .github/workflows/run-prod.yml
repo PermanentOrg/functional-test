@@ -2,8 +2,7 @@ name: Run shortlist (prod)
 
 on:
   repository_dispatch:
-    types: [prod-deployed]
-  workflow_dispatch:
+    types: [prod_deployed]
 
 jobs:
   execute:
