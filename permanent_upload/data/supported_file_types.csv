@@ -1,3 +1,4 @@
+file_extension,file_category,final_status,conversions
 wav,audio,ok,"wav,mp3"
 m4a,audio,ok,"m4a,mp3"
 mp3,audio,ok,"mp3"
