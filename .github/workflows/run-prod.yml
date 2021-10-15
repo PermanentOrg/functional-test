@@ -18,10 +18,16 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_DEFAULT_REGION }} 
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
       - name: Download test files
         run: aws s3 cp s3://permanent-repos/test_files/critical-path.zip .
       - name: Unarchive test files
         run: unzip critical-path.zip
       - name: Run the test
         run: python -m permanent_upload www files/
+  notify:
+    runs-on: ubuntu-latest
+    needs: execute
+    steps:
+      - name: Post a message in slack
+        run: curl -X POST -H 'Content-type:application/json' --data '{"text":"${{ needs.execute.result }} on prod"}' https://hooks.slack.com/services/TBBFM3TEY/B02HZB4Q8EN/${{ secrets.SLACK_TOKEN }}
