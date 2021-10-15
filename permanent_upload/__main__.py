@@ -2,7 +2,6 @@
 
 import argparse
 import logging
-import sys
 import os
 import time
 import string
@@ -10,6 +9,7 @@ import random
 from tabulate import tabulate
 
 from .permanent import PermanentAPI
+from .validation import validate_supported_types
 
 
 def get_file_list(path):
@@ -66,8 +66,8 @@ def main(environment, path):
         results.append(
             api.file_upload(f, parent_folder_id, parent_folder_link_id, timeout)
         )
-
     print(tabulate(results, headers, tablefmt="github"))
+    validate_supported_types(results)
 
 
 if __name__ == "__main__":

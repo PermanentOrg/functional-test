@@ -1,12 +1,6 @@
-#!/usr/bin/env python3
-
-import argparse
 import logging
-import sys
 import os
 import time
-import string
-import random
 import requests
 
 from . import utils
@@ -122,9 +116,7 @@ class PermanentAPI:
         }
 
         s3_info = self._get_presigned_url(record_vo)
-        utils.upload_to_s3(
-            s3_info["destinationUrl"], file_path, s3_info["presignedPost"]
-        )
+        utils.upload_to_s3(file_path, s3_info["presignedPost"])
         created_record_vo = self._register_record(record_vo, s3_info["destinationUrl"])
 
         attempts, processed_record = self._measure_post_upload_processing(
