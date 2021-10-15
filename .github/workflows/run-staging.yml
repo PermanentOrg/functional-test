@@ -27,6 +27,7 @@ jobs:
         run: python -m permanent_upload staging files/
   notify:
     runs-on: ubuntu-latest
+    if: always()
     needs: execute
     steps:
       - name: Post a message in slack
