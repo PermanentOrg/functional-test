@@ -15,11 +15,11 @@ def validate_supported_types(results, data_file="data/supported_file_types.csv")
         extension = result[0].split(".")[-1]
         assert validation_dataset[extension]
         # File type classification (e.g. audio, image)
-        assert validation_dataset[extension]["file_category"] == result[1]
+        assert result[1] == validation_dataset[extension]["file_category"]
         # Final status (e.g. ok, manual_review)
-        assert validation_dataset[extension]["final_status"] in set(
-            [result[2], "uploaded", "ok"]
+        assert result[2] in set(
+            [validation_dataset[extension]["final_status"], "uploaded", "ok"]
         )
-        if validation_dataset[extension]["final_status"] == "ok":
+        if result[2] == "ok":
             # File conversions (e.g. html,pdfa,txt)
-            assert validation_dataset[extension]["conversions"] == result[3]
+            assert result[3] == validation_dataset[extension]["conversions"]
