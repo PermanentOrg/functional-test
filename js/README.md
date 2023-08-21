@@ -13,3 +13,9 @@ Run `npm install` to install dependencies.
 To run headless tests, simply run `npm start`.
 
 To run tests in the Cypress UI, run `npm run cypress:open`.
+
+By default, the functional test is configured to run on the local web-app proxy. To point it to a specific environment when running locally, use the `CYPRESS_BASE_URL` environment variable when running the tests:
+
+```sh
+CYPRESS_BASE_URL=https://local.permanent.org npm run start
+```
