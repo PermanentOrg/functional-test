@@ -20,6 +20,10 @@ module.exports = {
     "prettier/prettier": "error",
     "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     "@typescript-eslint/no-unused-expressions": "off",
+    "@typescript-eslint/no-namespace": "off",
+    "@typescript-eslint/no-extraneous-class": "off",
+    "cypress/no-async-tests": "off",
+    "no-restricted-syntax": "off",
   },
   ignorePatterns: [".eslintrc.js"],
   env: {
