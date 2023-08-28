@@ -1,11 +1,12 @@
 export function generatePassword(length: number): string {
   const lowestPrintableCode = 33;
-  const highestPrintableCode = 126 - lowestPrintableCode;
+  const highestPrintableCode = 126;
+  const codeRange = highestPrintableCode - lowestPrintableCode;
   const array = new Uint32Array(length);
   crypto.getRandomValues(array);
   return Array.from(array)
     .map<string>((n) =>
-      String.fromCharCode(lowestPrintableCode + (n % highestPrintableCode)),
+      String.fromCharCode(lowestPrintableCode + (n % codeRange)),
     )
     .join("");
 }
