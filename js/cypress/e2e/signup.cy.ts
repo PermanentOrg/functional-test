@@ -1,24 +1,24 @@
-import { Credentials } from "../support/credentials";
+import { AccountDeletionRequest } from "../support/accountDeletionRequest";
+import {
+  generateNewEmail,
+  generatePassword,
+} from "../support/generateSignupCredentials";
 
 describe("signup spec", () => {
-  const credentials = new Credentials();
-  before(async () => {
-    await credentials.loadSession();
-    credentials.createNewSession();
-  });
+  const signupEmail = generateNewEmail(`${Cypress.env("BASE_EMAIL")}`);
+  const signupPassword = generatePassword(12);
+
   it("gets redirected to app/auth when logged out", () => {
     cy.visit(`/app`);
     cy.url().should("include", "app/auth");
   });
   it("can signup from login page", () => {
-    const email = credentials.getEmail();
-    const password = credentials.getPassword();
     cy.visit(`/app`);
     cy.get("a").contains("sign up").click();
     cy.get('input[name="name"]').type("Functional Test");
-    cy.get('input[name="email"').type(email);
-    cy.get('input[name="password"]').type(password);
-    cy.get('input[name="confirm"]').type(password);
+    cy.get('input[name="email"').type(signupEmail);
+    cy.get('input[name="password"]').type(signupPassword);
+    cy.get('input[name="confirm"]').type(signupPassword);
     cy.get("input#terms").check();
     cy.get("input#mailingList").uncheck();
 
@@ -40,7 +40,14 @@ describe("signup spec", () => {
     cy.url().should("include", "private");
   });
   it("can log in to new account", () => {
-    cy.login(credentials.getEmail(), credentials.getPassword());
+    cy.login(signupEmail, signupPassword);
     cy.url().should("include", "private");
+  });
+  after(() => {
+    cy.request(
+      "POST",
+      "api/account/delete",
+      new AccountDeletionRequest().getRequestVO(),
+    );
   });
 });

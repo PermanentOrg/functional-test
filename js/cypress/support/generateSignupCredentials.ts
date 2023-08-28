@@ -1,5 +1,3 @@
-import { webcrypto as crypto } from "crypto";
-
 export function generatePassword(length: number): string {
   const lowestPrintableCode = 33;
   const highestPrintableCode = 126 - lowestPrintableCode;
@@ -10,4 +8,9 @@ export function generatePassword(length: number): string {
       String.fromCharCode(lowestPrintableCode + (n % highestPrintableCode)),
     )
     .join("");
+}
+
+export function generateNewEmail(baseEmail: string): string {
+  const unixTime = Math.floor(new Date().getTime() / 1000);
+  return baseEmail.replace("@", `+prmnttstr${unixTime}@`);
 }
