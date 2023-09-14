@@ -9,7 +9,6 @@ export default defineConfig({
       return conf;
     },
     video: false,
-    specPattern: ["cypress/e2e/health.cy.ts", "cypress/e2e/signup.cy.ts"],
     baseUrl: "https://ng.permanent.org:4200",
   },
 });
