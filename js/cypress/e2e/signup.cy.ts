@@ -41,6 +41,7 @@ describe("signup spec", () => {
   });
   it("can log in to new account", () => {
     cy.login(signupEmail, signupPassword);
+    cy.visit("/app/private");
     cy.url().should("include", "private");
   });
   after(() => {
