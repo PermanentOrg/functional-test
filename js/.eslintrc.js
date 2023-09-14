@@ -22,6 +22,7 @@ module.exports = {
     "@typescript-eslint/no-unused-expressions": "off",
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-extraneous-class": "off",
+    "@typescript-eslint/no-use-before-define": "off",
     "cypress/no-async-tests": "off",
     "no-restricted-syntax": "off",
   },

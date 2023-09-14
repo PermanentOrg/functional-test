@@ -1,0 +1,27 @@
+[
+  {
+    "type": "document",
+    "extension": "odt"
+  },
+  {
+    "type": "video",
+    "extension": "mp4"
+  },
+  {
+    "type": "image",
+    "extension": "jpg"
+  },
+  {
+    "type": "presentation",
+    "extension": "odp"
+  },
+  {
+    "type": "spreadsheet",
+    "extension": "ods"
+  },
+  {
+    "type": "audio",
+    "extension": "mp3",
+    "convertTime": 45000
+  }
+]
