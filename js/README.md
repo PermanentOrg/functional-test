@@ -8,6 +8,21 @@ Currently it exists in a subdirectory since the plan is to eventually completely
 
 Run `npm install` to install dependencies.
 
+### Environment Files
+
+To set the preexisting account used for testing, copy the `cypress.env.json.template` file to `cypress.env.json` and fill in the account information.
+
+### Upload Test Files
+
+To run the upload test suite, you must fetch the test files from AWS. Using the AWS CLI credentials [used in the devenv,](https://github.com/PermanentOrg/devenv) Permanent engineers can fetch the proper testing files and move them into the `files` directory:
+
+```sh
+mkdir files
+aws s3 cp s3://permanent-repos/test_files/critical-path.zip .
+unzip critical-path.zip -d files
+rm critical-path.zip
+```
+
 ## Running Tests
 
 To run headless tests, simply run `npm start`.
