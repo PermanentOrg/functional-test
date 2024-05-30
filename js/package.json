@@ -32,6 +32,6 @@
   "dependencies": {
     "@tsconfig/node18-strictest": "^1.0.0",
     "@types/node": "^20.4.9",
-    "cypress": "^12.17.3"
+    "cypress": "^13.10.0"
   }
 }
