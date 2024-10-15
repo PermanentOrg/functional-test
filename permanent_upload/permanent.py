@@ -154,9 +154,25 @@ class PermanentAPI:
                     "password": password,
                     "passwordVerify": password,
                 },
+                "SimpleVO": {
+                    "key": "createArchive",
+                    "value": False,
+                },
             }
         ]
         return PermanentRequest(self.base_url, "/api/account/post", data=body)
+
+    def create_archive(self, name, archive_type):
+        logging.info("Create archive - Name: %s, Type: %s", name, archive_type)
+        body = [
+            {
+                "ArchiveVO": {
+                    "fullName": name,
+                    "type": archive_type,
+                }
+            }
+        ]
+        return PermanentRequest(self.base_url, "/api/archive/post", data=body)
 
     def login(self, email, password):
         logging.info("Login as %s", email)

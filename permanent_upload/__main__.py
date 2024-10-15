@@ -51,6 +51,7 @@ def main(environment, path):
 
     api = PermanentAPI(f"https://{environment}.permanent.org")
     createaccount_result = api.create_account(email, password)
+    api.create_archive("Functional Filetype Test", "type.archive.person")
     login_result = api.login(email, password)
     archive = login_result.response["ArchiveVO"]
     api.get_archive(archive["archiveId"], archive["archiveNbr"])
