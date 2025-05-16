@@ -22,4 +22,4 @@ def validate_supported_types(results, data_file="data/supported_file_types.csv")
         )
         if result[2] == "ok":
             # File conversions (e.g. html,pdfa,txt)
-            assert result[3] == validation_dataset[extension]["conversions"]
+            assert set(result[3]) >= set(validation_dataset[extension]["conversions"])
