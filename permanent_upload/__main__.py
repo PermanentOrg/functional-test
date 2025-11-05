@@ -65,7 +65,14 @@ def main(environment, path):
     for f in files:
         logging.info("Processing %s", f)
         results.append(
-            api.file_upload(f, parent_folder_id, parent_folder_link_id, timeout)
+            api.file_upload(
+                f,
+                parent_folder_id,
+                parent_folder_link_id,
+                archive["archiveId"],
+                login_result.response["SimpleVO"]["value"],
+                timeout,
+            )
         )
     print(tabulate(results, headers, tablefmt="github"))
     validate_supported_types(results)

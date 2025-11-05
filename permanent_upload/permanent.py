@@ -36,6 +36,40 @@ class PermanentRequest:
         PermanentRequest.csrf = json_resp["csrf"]
 
 
+class V2PermanentRequest:
+    csrf = ""
+    session = requests.Session()
+
+    def __init__(self, base_url, path, auth_token, data=[]):
+        """
+        Craft the fields required to make a request.
+        """
+        self.body = data
+        self.url = f"{base_url}{path}"
+        self.auth_token = auth_token
+        self.make_request()
+
+    def make_request(self):
+        """
+        Make a JSON post request to the API backend.
+        """
+        logging.debug("Request url: %s", self.url)
+        logging.debug("Request json: %s", self.body)
+        response = PermanentRequest.session.post(
+            self.url,
+            json=self.body,
+            headers={
+                "Request-Version": "2",
+                "Authorization": "Bearer " + self.auth_token,
+            },
+        )
+        if not response.ok:
+            utils.raise_for_status(response)
+        json_resp = response.json()
+        logging.debug("Response body: %s", json_resp)
+        self.response = json_resp
+
+
 class PermanentAPI:
     def __init__(self, base_url=None):
         if not base_url:
@@ -57,19 +91,12 @@ class PermanentAPI:
             i += 1
         return i, record
 
-    def _register_record(self, record_vo, s3_url):
-        logging.info("Register record for file %s", record_vo["displayName"])
-        body = {
-            "RecordVO": record_vo,
-            "SimpleVO": {
-                "key": "s3url",
-                "value": s3_url,
-            },
-        }
-        request = PermanentRequest(
-            self.base_url, "/api/record/registerRecord", data=body
+    def _register_record(self, auth_token, body):
+        logging.info("Register record for file %s", body["displayName"])
+        request = V2PermanentRequest(
+            self.base_url, "/api/record/registerRecord", auth_token, data=body
         )
-        return request.response["RecordVO"]
+        return request.response
 
     def _get_presigned_url(self, record_vo):
         logging.info("Get pre-signed URL for %s", record_vo["displayName"])
@@ -100,7 +127,15 @@ class PermanentAPI:
         request = PermanentRequest(self.base_url, "/api/record/get", data=body)
         return request.response["RecordVO"]
 
-    def file_upload(self, file_path, parent_folder_id, parent_folder_link_id, timeout):
+    def file_upload(
+        self,
+        file_path,
+        parent_folder_id,
+        parent_folder_link_id,
+        archive_id,
+        auth_token,
+        timeout,
+    ):
         """
         Perform the file upload requests, and then poll for status until the timeout.
         """
@@ -117,7 +152,18 @@ class PermanentAPI:
 
         s3_info = self._get_presigned_url(record_vo)
         utils.upload_to_s3(file_path, s3_info["presignedPost"])
-        created_record_vo = self._register_record(record_vo, s3_info["destinationUrl"])
+
+        request = {
+            "archiveId": archive_id,
+            "derivedCreatedDT": int(time.time()),
+            "displayName": filename,
+            "parentFolderId": parent_folder_id,
+            "parentFolder_linkId": parent_folder_link_id,
+            "uploadFileName": filename,
+            "size": os.path.getsize(file_path),
+            "s3url": s3_info["destinationUrl"],
+        }
+        created_record_vo = self._register_record(auth_token, request)
 
         attempts, processed_record = self._measure_post_upload_processing(
             created_record_vo, timeout
