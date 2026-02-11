@@ -49,7 +49,9 @@ def main(environment, path):
     timeout = 60
     print(f"Current timeout is {timeout} seconds")
 
-    api = PermanentAPI(f"https://{environment}.permanent.org")
+    api = PermanentAPI(
+        f"https://{"app.dev" if environment == "dev" else environment}.permanent.org"
+    )
     createaccount_result = api.create_account(email, password)
     api.create_archive("Functional Filetype Test", "type.archive.person")
     login_result = api.login(email, password)
@@ -58,7 +60,6 @@ def main(environment, path):
     api.get_account(createaccount_result.response["AccountVO"]["accountId"])
     api.logged_in()
     parent_folder_id, parent_folder_link_id = api.get_folder_info()
-
     files = get_file_list(path)
     results = []
     headers = ["File Name", "Type", "Status", "File Formats", "Time"]
