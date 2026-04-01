@@ -4,6 +4,8 @@ on:
   repository_dispatch:
     types: [dev_deployed]
   push:
+    branches:
+      - main
 
 
 jobs:
