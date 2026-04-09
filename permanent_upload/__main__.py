@@ -37,6 +37,13 @@ def parse_args():
 
     return parser.parse_args()
 
+def get_api(environment):
+    if environment == "dev":
+        return "https://app.dev.permanent.org"
+    elif environment == "staging":
+        return "https://app.staging.permanent.org"
+    else:
+        return f"https://{environment}.permanent.org"
 
 def main(environment, path):
     if not os.path.isdir(path):
@@ -49,9 +56,8 @@ def main(environment, path):
     timeout = 60
     print(f"Current timeout is {timeout} seconds")
 
-    api = PermanentAPI(
-        f"https://{"app.dev" if environment == "dev" else environment}.permanent.org"
-    )
+    host = get_api(environment)
+    api = PermanentAPI(host)
     createaccount_result = api.create_account(email, password)
     api.create_archive("Functional Filetype Test", "type.archive.person")
     login_result = api.login(email, password)
