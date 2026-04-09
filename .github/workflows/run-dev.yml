@@ -1,10 +1,10 @@
 name: Run shortlist (dev)
 
 on:
+  workflow_displatch:
   repository_dispatch:
     types: [dev_deployed]
   push:
-
 
 jobs:
   execute:
