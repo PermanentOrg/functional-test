@@ -1,7 +1,7 @@
 name: Run shortlist (dev)
 
 on:
-  workflow_displatch:
+  workflow_dispatch:
   repository_dispatch:
     types: [dev_deployed]
   push:
