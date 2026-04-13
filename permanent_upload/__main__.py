@@ -50,7 +50,7 @@ def main(environment, path):
     print(f"Current timeout is {timeout} seconds")
 
     api = PermanentAPI(
-        f"https://{"app.dev" if environment == "dev" else environment}.permanent.org"
+        f"https://{"app." if environment == "www" else "app." + environment}.permanent.org"
     )
     createaccount_result = api.create_account(email, password)
     api.create_archive("Functional Filetype Test", "type.archive.person")
