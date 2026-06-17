@@ -76,16 +76,25 @@ class PermanentAPI:
             raise Exception("Need `base_url` upon object creation")
         self.base_url = base_url
 
-    def _measure_post_upload_processing(self, record_vo, timeout):
+    def _measure_post_upload_processing(self, record_vo, expected_formats, timeout):
         record_id = record_vo["recordId"]
         archive_number = record_vo["archiveNbr"]
 
         i = 0
-        status = ""
         record = ""
+        status = ""
+        processing_complete = False
 
-        while i < timeout and status != "status.generic.ok":
+        while i < timeout and (
+            not processing_complete or status != "status.generic.ok"
+        ):
             record = self._get_record(record_id, archive_number)
+            actual_formats = {
+                vo["type"].split(".")[-1] for vo in (record.get("FileVOs") or [])
+            }
+            processing_complete = bool(expected_formats) and expected_formats.issubset(
+                actual_formats
+            )
             status = record["status"]
             time.sleep(1)
             i += 1
@@ -135,6 +144,7 @@ class PermanentAPI:
         archive_id,
         auth_token,
         timeout,
+        expected_formats,
     ):
         """
         Perform the file upload requests, and then poll for status until the timeout.
@@ -166,7 +176,7 @@ class PermanentAPI:
         created_record_vo = self._register_record(auth_token, request)
 
         attempts, processed_record = self._measure_post_upload_processing(
-            created_record_vo, timeout
+            created_record_vo, expected_formats, timeout
         )
         result = [
             filename,

@@ -2,15 +2,26 @@ import csv
 import os
 
 
-def validate_supported_types(results, data_file="data/supported_file_types.csv"):
-    validation_dataset = {}
+def _load_validation_dataset(data_file="data/supported_file_types.csv"):
+    dataset = {}
     data_file_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)), data_file
     )
     with open(data_file_path, "r") as csvfile:
-        validation_reader = csv.DictReader(csvfile)
-        for row in validation_reader:
-            validation_dataset[row["file_extension"]] = row
+        for row in csv.DictReader(csvfile):
+            dataset[row["file_extension"]] = row
+    return dataset
+
+
+def load_expected_formats(data_file="data/supported_file_types.csv"):
+    return {
+        ext: set(row["conversions"].split(","))
+        for ext, row in _load_validation_dataset(data_file).items()
+    }
+
+
+def validate_supported_types(results, data_file="data/supported_file_types.csv"):
+    validation_dataset = _load_validation_dataset(data_file)
     for result in results:
         extension = result[0].split(".")[-1]
         assert validation_dataset[extension]
