@@ -9,7 +9,7 @@ import random
 from tabulate import tabulate
 
 from .permanent import PermanentAPI
-from .validation import validate_supported_types
+from .validation import load_expected_formats, validate_supported_types
 
 
 def get_file_list(path):
@@ -46,7 +46,7 @@ def main(environment, path):
     email = f"engineers+prmnttstr{unix_timestamp}@permanent.org"
     print("User account email:", email)
     password = "".join(random.choice(string.ascii_letters) for i in range(12))
-    timeout = 60
+    timeout = 300
     print(f"Current timeout is {timeout} seconds")
 
     api = PermanentAPI(
@@ -61,10 +61,13 @@ def main(environment, path):
     api.logged_in()
     parent_folder_id, parent_folder_link_id = api.get_folder_info()
     files = get_file_list(path)
+    formats_by_extension = load_expected_formats()
     results = []
     headers = ["File Name", "Type", "Status", "File Formats", "Time"]
     for f in files:
         logging.info("Processing %s", f)
+        extension = os.path.splitext(f)[1].lstrip(".")
+        expected_formats = formats_by_extension.get(extension, set())
         results.append(
             api.file_upload(
                 f,
@@ -73,6 +76,7 @@ def main(environment, path):
                 archive["archiveId"],
                 login_result.response["SimpleVO"]["value"],
                 timeout,
+                expected_formats,
             )
         )
     print(tabulate(results, headers, tablefmt="github"))
